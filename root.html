@@ -1,0 +1,60 @@
+<!doctype HTML>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" context="text/html; charset=utf-8">
+    <title> NDSL - Cellular Accounting</title>
+    <link rel="stylesheet" href="./common.css">
+  </head>
+
+  <body>
+    <div class="main">
+
+      <div class="figure">
+        <img src="accounting.JPG" width="600" height="80" alt="PacketShader">
+	<div class="caption">
+          Study on Accounting of TCP Retransmissions in Cellular Data Traffic
+        </div>
+      </div>
+
+      <br>
+      <h2> Why Root a Device?</h2>
+      
+      <p>
+	We require the client device to be rooted or jailbroken in order to 
+	run a packet capture program (e.g. tcpdump, pirni). The method for
+	rooting/jailbreaking the device differs depending on the device 
+	manufacturer, model and the cellular ISP. You may find the rooting
+	procedures for your device via searching the web. If you need help 
+	on rooting the device, please send an email to 
+	<a href="mailto:yhwan@ndsl.kaist.edu">yhwan@ndsl.kaist.edu</a>.
+      </p>          
+
+      <h2> Ex. Galaxy S3 (GT-I9300) <a style="color: red">(Note: Does Not Work for Other Devices!)</a></h2>
+      
+      <p>
+	<b>Reference</b>: <a href="http://wccftech.com/guide-root-ubell6-android-412-jelly-bean-galaxy-s3-i9300/">http://wccftech.com/guide-root-ubell6-android-412-jelly-bean-galaxy-s3-i9300/</a><br><br>
+
+	1. Download and extract root firmware and Odin program to Windows PC for installing firmware to the client device.<br>
+	<div style="border: 1px dotted black; margin-left: 46px; padding: 5px; background: #f8f8f8">
+	  Root Firmware: <a href="http://download.chainfire.eu/229/CF-Root/CF-Auto-Root/CF-Auto-Room-m0-m0xx-gti9300.zip">Download</a> (Extract: CF-Auto-Root-m0-m0xx-gti9300.tar.md5)<br>
+          Odin 3.07: <a href="http://www.mediafire.com/?7v7zor9d379emeg">Download</a> (Extract: Odin3 v3.07.exe)
+        </div>
+        </p><p>
+	2. Switch off the device.<br><br>
+	3. Restart the device in "Download Mode" by holding down on (Volume Down Button + Home Button + Power Button). Then press Volume Down Button to continue.<br><br>
+	4. Run Odin v3.07.exe in administrator rights.<br><br>
+	5. Connect the device to the PC via USB cable. Check a notification appear in Odin in the bottom left saying "Added!".<br><br>
+	6. Click on PDA Button, and select CF-Auto-Root-m0-m0xx-gti9300.tar.md5 file.<br><br>
+	7. Make sure that "Auto Reboot" and "F. Reset Time" boxes are checked.<br><br>
+	8. Click on START Button to begin download. The device will automatically reboot if download was successful.<br><br>
+	9. When a green PASS notification appears, unplug the device from the PC.
+      </p>          
+
+      <div class="footer">
+        Last modified: Thu, 7 Mar 2013 / 
+        <a href="http://www.ndsl.kaist.edu">Networked & Distributed Computing Systems Lab</a>
+      </div>
+    </div>
+  </body>
+</html>  
+

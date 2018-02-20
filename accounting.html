@@ -1,0 +1,257 @@
+<!doctype HTML>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" context="text/html; charset=utf-8">
+    <title> NDSL - Cellular Accounting</title>
+    <link rel="stylesheet" href="./common.css">
+  </head>
+
+  <body>
+    <div class="main">
+
+      <div class="figure">
+        <img src="accounting.JPG" width="600" height="80" alt="PacketShader">
+	<div class="caption">
+          Study on Accounting of TCP Retransmissions in Cellular Data Traffic
+        </div>
+      </div>
+
+      <br>
+      <h2> Why Study on Cellular Accounting of TCP Retransmission?</h2>
+      
+      <p>
+	The current architecture supporting data services to mobile devices
+	is built below the network layer (IP) and users receive the payload
+	at the application layer. Between them is the transport layer that can
+	cause data consumption inflation due to the retransmission mechanism 
+	that provides reliable delivery. We examine the cellular ISPs by 
+	looking at their accounting policies regarding the transport layer 
+	reliability mechanism with TCP's retransmission, and show that the
+	current implementation of accounting policies either fails to meet
+	the billing fairness or is vulnerable to charge evasions. ISPs that 
+	charge for all IP packets regardless of retransmission allows attackers 
+	to inflate a victim's bill by intentionally retransmitting packets. 
+	ISPs that deduct the retransmitted amount from the user's bill allows 
+	tunneling through TCP retransmissions. 
+      </p>
+           
+      <h2> Setup</h2>
+
+      <p>
+	<u><b>Client</b></u><br><br>
+
+        Setup a simple client that measures the total retransmission 
+	volume by capturing all packets flowing through the device. Currently, 
+	we require the device to be rooted or jailbroken to be able to capture 
+	the packets <a href="root.html"><b>(How to root a device?)</b></a>. Install following programs/binaries.
+      </p>
+
+      <ul>
+        <li>
+          <b>Terminal</b>: run necessary programs such as packet capture and HTTP 
+	  download on client device by downloading any terminal applications from the
+	  app market.
+	  <br>
+	  <div style="border: 1px dotted black; padding: 5px; background: #f8f8f8">
+            <a href="http://play.google.com/store/apps/details?id=jackpal.androidterm&hl=en">Android Terminal Emulator</a> (Android) - Linux command line shell.</a><br>
+            <a href="http://code.google.com/p/mobileterminal/">MobileTerminal</a> (iOS) - Terminal emulator for iPhone.
+	    <a href="http://www.iclarified.com/entry/index.php?enid=5882">(Simple Installation)</a><br>
+          </div>
+          <br>
+        </li>
+
+        <li>
+          <b>Packet Capture</b>: capture all packets flowing through the client device.
+	  <br>
+	  <div style="border: 1px dotted black; padding: 5px; background: #f8f8f8">
+            tcpdump (Android) - <a href="http://gadgetcat.wordpress.com/2011/09/11/tcpdump-on-android/">http://gadgetcat.wordpress.com/2011/09/11/tcpdump-on-android/</a><br>
+            pirni (iOS) - <a href="http://code.google.com/p/n1mda-dev/wiki/PirniUsageGuide">http://code.google.com/p/n1mda-dev/wiki/PirniUsageGuide</a><br>
+          </div>
+          <br>
+        </li>
+
+        <li>
+          <b>HTTP Download</b>: request a file download from our HTTP server.
+	  <br>
+	  <div style="border: 1px dotted black; padding: 5px; background: #f8f8f8">
+            wget (Android) - Install binary from <a href="http://play.google.com/store/apps/details?id=com.jrummy.busybox.installer&hl=en">BusyBox Installer</a> app.
+          </div>
+          <br>
+        </li>
+      </ul>
+
+      <p>
+	<u><b>Server</b></u><br><br>
+
+        Run a simple HTTP server that retransmits packets to a
+	client device. For simplicity, our server maintains a TCP window size
+	of one packet and does not implement congestion nor flow control.<br>
+	Download the HTTP server source code <a href="accounting/accounting.tar.gz"><b>here</b></a>.<br>
+      </p>
+    
+      <ul>
+        <li>
+	  Set the TCP window scale to appropriate value. (optional)
+	  <br>
+	  <div style="border: 1px dotted black; padding: 5px; background: #f8f8f8">
+            $ sudo sysctl -w net.ipv4.tcp_window_scaling=7<br>
+	    <a style="color: red">(or change server code to match the current machine's setting. e.g. #define WINDOW_SCALE = 7)</a>
+          </div>
+          <br>
+        </li>
+
+        <li>
+          Install necessary packages and compile the source code.
+	  <br>
+	  <div style="border: 1px dotted black; padding: 5px; background: #f8f8f8">
+            $ sudo apt-get install libpcap-dev<br>
+            $ make
+          </div>
+          <br>
+        </li>
+
+        <li>
+          <b>Controlled Retransmissions</b>: send same data packet for 'n' times.
+	  <br>
+	  <div style="border: 1px dotted black; padding: 5px; background: #f8f8f8">
+            $ sudo ./cont_retrans [port] [num of same packet]<br>
+	    Note: You can stop here if the cellular ISP accounts for all retransmission packets.
+          </div>
+          <br>
+        </li>
+
+        <li>
+          <b>Quasi Retransmissions</b>: partially overlap data payload with previous
+	  packet by incrementing the send window by just one byte.
+	  <br>
+	  <div style="border: 1px dotted black; padding: 5px; background: #f8f8f8">
+            $ sudo ./quasi_retrans [port]
+          </div>
+          <br>
+        </li>
+
+        <li>
+          <b>Tunneling through Retransmissions</b>: send same data packet for
+	  'n' times with different payload.
+	  <br>
+	  <div style="border: 1px dotted black; padding: 5px; background: #f8f8f8">
+            $ sudo ./tunnel_retrans [port] [num of same packet]
+          </div>
+          <br>
+        </li>
+      </ul>
+    
+      <h2> Measurement Process</h2>
+
+      <p>
+	<a style="color: red"><b>(NOTE: Please check whether everything is working with Wi-Fi, then test with 3G/4G.)</b></a><br>
+	<a style="color: red"><b>(NOTE: During testing, please try to minimize other cellular traffic such as running other applications.)</b></a><br><br>
+
+	<u><b>Preliminary Environment</b></u><br><br>
+	1. Disable 3G/4G interface on the client device.<br>
+	2. Wait until cellular ISP shows the latest accounted volume. Check the 
+	volume via website or app. (Note: It may take from minutes to hours depending on the ISP.)<br>
+	3. Create a folder in the <b>client</b> device to store packet capture files using 
+	the terminal.<br>
+	<div style="border: 1px dotted black; margin-left: 46px; padding: 5px; background: #f8f8f8">
+	  $ cd sdcard<br>
+	  $ mkdir accounting
+        </div>
+	</p><p>
+	4. Create files in the <b>server</b> with different sizes for HTTP download.<br>
+	<div style="border: 1px dotted black; margin-left: 46px; padding: 5px; background: #f8f8f8">
+	  (e.g. 1MB File)<br>
+	  $ dd if=/dev/zero of=1MB bs=1024 count=1024<br><br>
+
+	  <u>Appropriate File Sizes</u> <a style="color: red">(depends on volume granularity given by cellular ISP & 3G/4G bandwidth)</a><br>
+	  Controlled Retransmission: 1MB (1KB granularity) / 10~100 x ISP granularity (other)<br>
+	  Quasi Retransmission: 10KB (1KB granularity) / 75KB (LTE)<br>
+	  Tunneling through Retransmission: 1MB (1KB granularity) / 10~100 x ISP granularity (other)
+        </div><br>
+      </p>
+
+      <p>
+	<u><b>Test Process</b></u><br><br>
+	1. Begin retransmission server (e.g. controlled, quasi, or tunneling) 
+	with chosen port number & number of same packet to send. <a style="color: red">(num of same packet = 2 ~ 10. It may take longer time as number increases.)</a><br>
+	2. Enable 3G/4G interface on the client device.<br>
+	3. Client Terminal 1: begin packet capture.
+	<div style="border: 1px dotted black; margin-left: 46px; padding: 5px; background: #f8f8f8">
+          $ cd sdcard/accounting<br>
+	  $ su<br>
+	  # tcpdump -i [interface] -w cont_retrans.pcap <a style="color: red">(name pcap file accordingly)</a><br>
+	  <a style="color: red">(NOTE: Retrieve interface name via 'ifconfig' or 'netcfg' command.)</a><br>
+        </div>
+        </p><p>
+        4. Client Terminal 2: run HTTP download.<br>
+	<div style="border: 1px dotted black; margin-left: 46px; padding: 5px; background: #f8f8f8">
+          $ cd sdcard/accounting<br>
+	  $ wget http://[server address]:[port]/[filename] <a style="color: red">(for busybox: $ busybox wget...)</a>
+        </div>
+        </p><p>
+        5. At download completion, close HTTP download & packet capture.<br>
+	<div style="border: 1px dotted black; margin-left: 46px; padding: 5px; background: #f8f8f8">
+	  e.g. Android Terminal Emulator: 'Volume Down Key' + 'c'<br>
+          Note: Client may send RST packet at receiving retransmitted packet of the last data packet.
+        </div>
+        </p><p>
+	6. Disable 3G/4G interface on the client device.<br><br><br>
+
+	<u><b>Result Analysis</b></u><br><br>
+	1. Wait until cellular ISP refreshes its accounted volume to the latest value.<br>
+	2. Move the packet capture file from the client device to a linux machine for calculation.<br>
+	3. Fill in the spreadsheet from the result values retrieved by running the script.
+	[<a href="accounting/result.xls"><b>spreadsheet (excel)</b></a>, <a href="accounting/result.sh"><b>script</b></a>]<br>
+	The other values in the spreadsheet will be automatically filled in.
+	<div style="border: 1px dotted black; margin-left: 46px; padding: 5px; background: #f8f8f8">
+	  $ sudo apt-get install tshark <a style="color: red">(we need "tshark" to run the script)</a><br>
+	  $ bash result.sh [packet capture filename] [server IP address]<br><br>
+
+	  <b>File Size</b>: original size of downloaded file<br>
+	  <b>Num of Same Packet</b>: number of same packet parameter set at the server<br>
+	  <b>Start Volume</b>: accounted volume by ISP before the test<br>
+	  <b>End Volume</b>: accounted volume by ISP after the test<br><br>
+
+	  <u>From the Script: (frames, bytes)</u><br>
+	  <b>Background Traffic</b>: total volume consumed by other applications<br>
+	  <b>DNS Traffic</b>: total volume consumed by DNS lookup<br>
+	  <b>Total Test Volume</b>: total volume consumed by test<br>
+	  <b>Data Packet</b>: total data packet volume consumed by test<br>
+	  <b>ACK Packet</b>: total ACK packet volume consumed by test<br>
+	</div>
+      </p>
+
+      <h2>Publications</h2>
+      
+      <ul>
+        <li> 
+          <a href="http://www.ndsl.kaist.edu/~kyoungsoo/papers/hotmobile13.pdf"> 
+            Towards Accurate Accounting of Cellular Data for TCP Retransmission
+          </a> <br>
+          Younghwan Go, Denis Foo Kune, Shinae Woo, KyoungSoo Park, and Yongdae Kim. <br>
+          In Proceedings of ACM HotMobile 2013, Jekyll Island, GA, USA. February 2013.
+        </li>
+      </ul>
+  
+  
+      <h2>People</h2>
+
+      <p>
+        Students: 
+        <a href="http://www.ndsl.kaist.edu/~yhwan/">Younghwan Go</a>, 
+        <a href="http://www-users.cs.umn.edu/~foo/">Denis Foo Kune</a> and
+        <a href="http://www.ndsl.kaist.edu/~shinae/">Shinae Woo</a> <br> 
+      
+        Faculty: 
+        <a href="http://www.ndsl.kaist.edu/~kyoungsoo/">KyoungSoo Park</a> and 
+        <a href="http://syssec.kaist.ac.kr/~yongdaek/">Yongdae Kim</a> <br>
+      </p>
+
+      <div class="footer">
+        Last modified: Sun, 31 Mar 2013 / 
+        <a href="http://www.ndsl.kaist.edu">Networked & Distributed Computing Systems Lab</a>
+      </div>
+    </div>
+  </body>
+</html>  
+
